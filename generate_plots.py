@@ -73,29 +73,33 @@ def plot_scatter(sensor_a, sensor_b, timestamps, ax):
 # the histogram from the notebook onto the given Axes object.
 # NumPy-style docstring. Modifies ax in place, returns None.
 
-def plot_histogram(data, bins, ax):
-    """Draw a histogram of the given data on the specified Axes.
+def plot_histogram(sensor_a, sensor_b, bins, ax):
+    """Draw overlaid histograms for Sensor A and Sensor B on the specified Axes.
 
     Parameters
     ----------
-    data : numpy.ndarray
-        Data values to plot in the histogram.
+    sensor_a : numpy.ndarray
+        Sensor A temperature readings to plot.
+    sensor_b : numpy.ndarray
+        Sensor B temperature readings to plot.
     bins : int
-        Number of bins to use for the histogram.
+        Number of bins to use for each histogram.
     ax : matplotlib.axes.Axes
-        Axes object on which to draw the histogram.
+        Axes object on which to draw the histograms.
 
     Returns
     -------
     None
         The function modifies ``ax`` in place.
     """
-    ax.hist(data, bins=bins, alpha=0.5, color='tab:blue')
-    mean_value = np.mean(data)
-    ax.axvline(mean_value, color='tab:blue', linestyle='--', linewidth=1.5, label='Mean')
+    ax.hist(sensor_a, bins=bins, alpha=0.5, color='tab:blue', label='Sensor A')
+    ax.hist(sensor_b, bins=bins, alpha=0.5, color='tab:orange', label='Sensor B')
+    for values, color, label in [(sensor_a, 'tab:blue', 'Sensor A mean'), (sensor_b, 'tab:orange', 'Sensor B mean')]:
+        mean_value = np.mean(values)
+        ax.axvline(mean_value, color=color, linestyle='--', linewidth=1.5, label=label)
     ax.set_xlabel('Temperature (°C)')
     ax.set_ylabel('Count')
-    ax.set_title('Temperature Distribution')
+    ax.set_title('Overlaid Temperature Distribution for Sensor A and Sensor B')
     ax.legend()
     ax.grid(True, linestyle='--', alpha=0.4)
 
@@ -120,15 +124,22 @@ def plot_boxplot(data, labels, ax):
     None
         The function modifies ``ax`` in place.
     """
-    ax.boxplot(
+    box = ax.boxplot(
         data,
         labels=labels,
         patch_artist=True,
+        showmeans=True,
         boxprops=dict(facecolor='lightgray', edgecolor='black'),
         medianprops=dict(color='red'),
         whiskerprops=dict(color='black'),
         capprops=dict(color='black'),
+        meanprops=dict(marker='o', markerfacecolor='black', markeredgecolor='black')
     )
+    colors = ['tab:blue', 'tab:orange']
+    for patch, color in zip(box['boxes'], colors):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.6)
+
     overall_mean = np.mean(np.concatenate(data))
     ax.axhline(overall_mean, color='blue', linestyle='--', linewidth=1.5,
                label=f'Overall mean = {overall_mean:.2f} °C')
@@ -159,7 +170,7 @@ def main():
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
     plot_scatter(sensor_a, sensor_b, timestamps, axes[0])
-    plot_histogram(np.concatenate([sensor_a, sensor_b]), bins=30, ax=axes[1])
+    plot_histogram(sensor_a, sensor_b, bins=30, ax=axes[1])
     plot_boxplot([sensor_a, sensor_b], labels=['Sensor A', 'Sensor B'], ax=axes[2])
 
     fig.tight_layout()
