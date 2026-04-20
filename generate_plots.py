@@ -67,3 +67,71 @@ def plot_scatter(sensor_a, sensor_b, timestamps, ax):
     ax.set_title('Simulated Sensor Temperature Readings')
     ax.legend()
     ax.grid(True, linestyle='--', alpha=0.4)
+
+# Create plot_histogram(data, bins, ax) that draws
+# the histogram from the notebook onto the given Axes object.
+# NumPy-style docstring. Modifies ax in place, returns None.
+
+def plot_histogram(data, bins, ax):
+    """Draw a histogram of the given data on the specified Axes.
+
+    Parameters
+    ----------
+    data : numpy.ndarray
+        Data values to plot in the histogram.
+    bins : int
+        Number of bins to use for the histogram.
+    ax : matplotlib.axes.Axes
+        Axes object on which to draw the histogram.
+
+    Returns
+    -------
+    None
+        The function modifies ``ax`` in place.
+    """
+    ax.hist(data, bins=bins, alpha=0.5, color='tab:blue')
+    mean_value = np.mean(data)
+    ax.axvline(mean_value, color='tab:blue', linestyle='--', linewidth=1.5, label='Mean')
+    ax.set_xlabel('Temperature (°C)')
+    ax.set_ylabel('Count')
+    ax.set_title('Temperature Distribution')
+    ax.legend()
+    ax.grid(True, linestyle='--', alpha=0.4)
+
+# Create plot_boxplot(data, labels, ax) that draws
+# the box plot from the notebook onto the given Axes object.
+# NumPy-style docstring. Modifies ax in place, returns None.
+
+def plot_boxplot(data, labels, ax):
+    """Draw a side-by-side box plot for the given datasets on the provided Axes.
+
+    Parameters
+    ----------
+    data : list of numpy.ndarray
+        List of data arrays to visualize in separate box plots.
+    labels : list of str
+        Labels for each dataset shown on the x-axis.
+    ax : matplotlib.axes.Axes
+        Axes object on which to draw the box plot.
+
+    Returns
+    -------
+    None
+        The function modifies ``ax`` in place.
+    """
+    ax.boxplot(
+        data,
+        labels=labels,
+        patch_artist=True,
+        boxprops=dict(facecolor='lightgray', edgecolor='black'),
+        medianprops=dict(color='red'),
+        whiskerprops=dict(color='black'),
+        capprops=dict(color='black'),
+    )
+    overall_mean = np.mean(np.concatenate(data))
+    ax.axhline(overall_mean, color='blue', linestyle='--', linewidth=1.5,
+               label=f'Overall mean = {overall_mean:.2f} °C')
+    ax.set_ylabel('Temperature (deg C)')
+    ax.set_title('Sensor A vs Sensor B Temperature Distributions')
+    ax.legend()
+    ax.grid(True, axis='y', linestyle='--', alpha=0.4)
